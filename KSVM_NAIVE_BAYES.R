@@ -1,6 +1,6 @@
 #KSVM
 
-
+#Look at group and individual data
 groupVsIndBar <- ggplot(combinedDataMod, aes(x=as.factor(combinedDataMod$GROUPS_VS_FIT_R))) + geom_bar(aes( fill=factor(combinedDataMod$NPS_Type))) + ggtitle("Distribution of NPS Type with Type of Traveller") + theme(plot.title = element_text(hjust = 0.5)) + xlab("Type of Traveller") + ylab("Count of Traveller") + labs(fill="NPS Type")
 groupVsIndBar
 
@@ -9,6 +9,7 @@ indSubset <- subset(combinedDataMod, combinedDataMod$GROUPS_VS_FIT_R == "FIT")
 
 groupInddataSet <- groupSubset
 
+#Clean group subset
 groupCleaned <- checkAndRemoveEmptyandNAvalues(groupInddataSet, groupInddataSet$`Dry-Cleaning_PL`)
 groupCleaned <- checkAndRemoveEmptyandNAvalues(groupCleaned, groupCleaned$`All Suites_PL`)
 groupCleaned <- checkAndRemoveEmptyandNAvalues(groupCleaned, groupCleaned$Casino_PL)
@@ -58,9 +59,11 @@ head(randomizedIndex)
 
 indexFortowthird <- floor(2*(dim(data2Use)[1])/3)
 
+#Create training and testing subsets
 trainingData <- data2Use[1:indexFortowthird,]
 testingData <- data2Use[(indexFortowthird+1):nrow(data2Use),]
 
+#Load library for ksvm
 library(kernlab)
 ksvm_Model<-ksvm(NPS_Type~`Dry-Cleaning_PL`  + `All Suites_PL` + InteretSatType + tranquilityType + staffCareType +  Elevators_PL + Laundry_PL + `Brand Initial_PL` +  Type_PL   + Relationship_PL  + `Fitness Center_PL`,data=trainingData, kernel = "rbfdot", kpar = "automatic", C = 50, cross = 3, prob.model = TRUE)
 
@@ -72,7 +75,7 @@ nrow(testingData)
 
 testingData$predictedValues <- ksvmPredict
 
-
+#Function to check accuracy of predicted model
 functionForKSVMAccuracy <- function(dataSet){
   a <- ifelse(dataSet$testingData.NPS_Type == dataSet$testingData.predictedValues, 1,0)
   return(length(which((a==1) == TRUE))/nrow(dataSet) * 100)
@@ -89,6 +92,7 @@ predictedPlot
 library(gridExtra)
 grid.arrange(originalPlot, predictedPlot, ncol=2)
 
+#Load library for Naive Bayes
 library(naivebayes)
 nb_Model <- naiveBayes(NPS_Type~staffCareType + tranquilityType + `Dry-Cleaning_PL`  + `All Suites_PL` + Elevators_PL + Laundry_PL + `Brand Initial_PL` +  Type_PL   + Relationship_PL  + InteretSatType + `Fitness Center_PL`, data=trainingData)
 nbPred <- predict(nb_Model, testingData)
@@ -100,6 +104,8 @@ nrow(testingData)
 testingData$predictedValuesNB <- nbPred
 comparisonTable <- data.frame(testingData$NPS_Type,testingData$predictedValuesNB)
 table(comparisonTable)
+
+#Function to check accuracy of NB Model
 functionForNBAccuracy <- function(dataSet){
   a <- ifelse(dataSet$testingData.NPS_Type == dataSet$testingData.predictedValuesNB, 1,0)
   return(length(which((a==1) == TRUE))/nrow(dataSet) * 100)
