@@ -7,8 +7,10 @@ library(ggplot2)
 unique(combinedDataMod$Gender_H)
 combinedDataModT <- combinedDataMod[(combinedDataMod$Gender_H=="Male") | (combinedDataMod$Gender_H=="Female"),]
 
+#Plot bar graph for gender data
 FemMalePlot <- ggplot(combinedDataModT, aes(x=as.factor(combinedDataModT$Gender_H))) + geom_bar(aes( fill=factor(combinedDataModT$NPS_Type))) + ggtitle("Distribution of NPS Type with Gender") + theme(plot.title = element_text(hjust = 0.5)) + xlab("Gender of Traveller") + ylab("Count of Traveller") + labs(fill="NPS Type")
 FemMalePlot
+
 
 asd <- combinedDataModT
 asd <- checkAndRemoveEmptyandNAvalues(asd, asd$Tranquility_H)
@@ -23,6 +25,7 @@ MaleSubset <- subset(combinedDataModT, combinedDataModT$Gender_H == "Male")
 #Female Subset
 dataAssocitionSet <- FemaleSubset
 
+#Clean columns in Female Subset
 dataAssociationCleaned <- checkAndRemoveEmptyandNAvalues(dataAssocitionSet, dataAssocitionSet$`Dry-Cleaning_PL`)
 dataAssociationCleaned <- checkAndRemoveEmptyandNAvalues(dataAssociationCleaned, dataAssociationCleaned$`All Suites_PL`)
 dataAssociationCleaned <- checkAndRemoveEmptyandNAvalues(dataAssociationCleaned, dataAssociationCleaned$Casino_PL)
@@ -71,10 +74,12 @@ dataAssociationCleaned$`Fitness Center_PL` <- as.factor(dataAssociationCleaned$`
 dataAssociationCleaned$Golf_PL <- as.factor(dataAssociationCleaned$Golf_PL)
 dataAssociationCleaned$`Business Center_PL` <- as.factor(dataAssociationCleaned$`Business Center_PL`)
 
+#Select columns for Assioication Rules
 colForArules <- dataAssociationCleaned[, c("Dry-Cleaning_PL", "All Suites_PL", "Casino_PL", "Elevators_PL", "Laundry_PL", "NPS_Type","LENGTH_OF_STAY_CATEGORY_R",
                                  "Brand Initial_PL","Type_PL","Relationship_PL", "Fitness Center_PL",
                                  "tranquilityType", "staffCareType", "InteretSatType")]
 
+#Load libraries to plot association rules
 library(arulesViz)
 library(arules)
 
@@ -93,8 +98,6 @@ plot((genderRulesPromoters), method="graph", control=list(type="items"))
 
 #Male Subset
 
-
-#Female Subset
 dataAssocitionSet <- MaleSubset
 
 dataAssociationCleaned <- checkAndRemoveEmptyandNAvalues(dataAssocitionSet, dataAssocitionSet$`Dry-Cleaning_PL`)
@@ -145,12 +148,11 @@ dataAssociationCleaned$`Fitness Center_PL` <- as.factor(dataAssociationCleaned$`
 dataAssociationCleaned$Golf_PL <- as.factor(dataAssociationCleaned$Golf_PL)
 dataAssociationCleaned$`Business Center_PL` <- as.factor(dataAssociationCleaned$`Business Center_PL`)
 
+#Columns for Male Subset
 colForArules <- dataAssociationCleaned[, c("Dry-Cleaning_PL", "All Suites_PL", "Casino_PL", "Elevators_PL", "Laundry_PL", "NPS_Type","LENGTH_OF_STAY_CATEGORY_R",
                                            "Brand Initial_PL","Type_PL","Relationship_PL", "Fitness Center_PL",
                                            "tranquilityType", "staffCareType", "InteretSatType")]
 
-library(arulesViz)
-library(arules)
 
 genderRulesPromoters <- apriori(colForArules, parameter = list(support = 0.6, confidence = 0.8), appearance = list(default  = "lhs", rhs=("NPS_Type=Promoter")))
 summary(genderRulesPromoters)
