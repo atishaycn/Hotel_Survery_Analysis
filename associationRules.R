@@ -1,12 +1,15 @@
 #Association rules for Gender - Male & Female Subset
+
+#Load library for visualization
 library(ggplot2)
 
+#Find unique values from Gender
 unique(combinedDataMod$Gender_H)
 combinedDataModT <- combinedDataMod[(combinedDataMod$Gender_H=="Male") | (combinedDataMod$Gender_H=="Female"),]
 
 FemMalePlot <- ggplot(combinedDataModT, aes(x=as.factor(combinedDataModT$Gender_H))) + geom_bar(aes( fill=factor(combinedDataModT$NPS_Type))) + ggtitle("Distribution of NPS Type with Gender") + theme(plot.title = element_text(hjust = 0.5)) + xlab("Gender of Traveller") + ylab("Count of Traveller") + labs(fill="NPS Type")
 FemMalePlot
-##@@@@@@@TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 asd <- combinedDataModT
 asd <- checkAndRemoveEmptyandNAvalues(asd, asd$Tranquility_H)
 ggplot(asd, aes(Tranquility_H, fill = factor(NPS_Type))) + 
