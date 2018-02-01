@@ -1,12 +1,15 @@
+
 install.packages("magrittr")
 library(magrittr)
 library(dplyr)
 library(randomForest)
 library(ggthemes)
 
+#See all types of purpose of visit
 unique(combinedDataMod$POV_CODE_C)
 combinedDataModT <- combinedDataMod[(combinedDataMod$POV_CODE_C=="BUSINESS") | (combinedDataMod$POV_CODE_C=="LEISURE"),]
 
+#Visualize data for both Business and Leisure Data
 BusiLeisure <- ggplot(combinedDataModT, aes(x=as.factor(combinedDataModT$POV_CODE_C))) + geom_bar(aes( fill=factor(combinedDataModT$NPS_Type)))
 BusiLeisure
 
@@ -72,6 +75,7 @@ data2Use$ALL_Suites <- data2Use$`All Suites_PL`
 data2Use$BRand <- data2Use$`Brand Initial_PL`
 data2Use$Fitness <- data2Use$`Fitness Center_PL`
 
+#Training and Testing Data
 randomizedIndex <- (sample(1:dim(data2Use)[1]))
 head(randomizedIndex)
 
@@ -80,7 +84,7 @@ indexFortowthird <- floor(2*(dim(data2Use)[1])/3)
 trainingData <- data2Use[1:indexFortowthird,]
 testingData <- data2Use[(indexFortowthird+1):nrow(data2Use),]
 
-
+#Model for random forest
 rf_Model <- randomForest(factor(NPS_Type) ~ staffCareType +customerSatisfactionType + guesRoomSatisfactionType+
                            tranquilityType  + HotelConditionType +FoodBevExpType ,data=trainingData)
 rf_Model
@@ -102,6 +106,7 @@ nrow(testingData)
 
 testingData$rfpred <- rfPredict
 
+#Function to check accuracy of random forest
 functionForRForestAccuracy <- function(dataSet){
   a <- ifelse(dataSet$testingData.NPS_Type == dataSet$testingData.rfpred, 1,0)
   return(length(which((a==1) == TRUE))/nrow(dataSet))
